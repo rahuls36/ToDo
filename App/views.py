@@ -1,35 +1,16 @@
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 from django.views import View
 import json
-from django.urls import reverse
 from django.shortcuts import redirect
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from App.models import ToDo,Tags
 from django.core import serializers
-import urllib.parse as parse
+from .utils import decode_data,check_authentication,create_url
 from collections import defaultdict
 from django.views.decorators.csrf import csrf_exempt
 
-
 # Create your views here.
-
-def check_authentication(func):
-    def check_auth(*args, **kwargs):
-        user = args[1].user
-        return func(*args, **kwargs) if user.is_authenticated else HttpResponseForbidden()
-    return check_auth
-
-def create_url(user, view_name):
-    base_url = reverse(view_name)
-    query = parse.urlencode({"id": user.id})
-    url = base_url[:-1] + "?" + query
-    return url
-
-def decode_data(body):
-    return json.loads(body.decode()) if body else ""
-
-
 class Register(View):
 
     def post(self, request):
@@ -74,7 +55,7 @@ class Logout(View):
     @check_authentication
     def get(self, request):
         request.session.flush()
-        return HttpResponse("Succefull")
+        return HttpResponse("Logged out Successfully")
 
 
 class ToDoView(View):

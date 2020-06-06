@@ -34,30 +34,21 @@ class Register(View):
 
     def post(self, request):
         response = HttpResponse()
-        try:
-            user_data = json.loads(request.body.decode())
-            username = user_data.get("username") or ""
-            password = user_data.get("password") or ""
-        except:
-            response.write("Enter Valid Data")
-            response.status_code = 400
-            return response
-        try:
+        user_data = decode_data(request.body)
+        if user_data and isinstance(user_data, dict):
             if request.user.is_autheticated:
-                response.status_code = 200
-                response.write("Already exists!")
-        except:
-            try:
-                if 'user' in request.session or User.objects.get(username=username):
-                    response.status_code = 409
-                    response.write("Already exists")
-            except:
+                response.status_code = 409
+                response.write("User Already exists!")
+                return response
+            username = user_data.get("username")
+            password = user_data.get("password")
+            if username and password:
                 User.objects.create_user(username, password=password)
                 response.status_code = 201
                 request.session['user'] = username
-                # request.session.set_expiry(20)
-                response.write("Created!")
-        return response
+                response.write("Created User")
+                return response
+        return HttpResponseBadRequest("Enter the Proper Credentials")
 
 class Login(View):
 

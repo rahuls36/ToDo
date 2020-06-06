@@ -11,8 +11,7 @@ def check_authentication(func):
 
 def create_url(user, view_name):
     base_url = reverse(view_name)
-    query = parse.urlencode({"id": user.id})
-    url = base_url[:-1] + "?" + query
+    url = base_url + str(user.id) + "/"
     return url
 
 def decode_data(body):

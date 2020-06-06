@@ -88,8 +88,8 @@ class ToDoView(View):
                     return response
             if name:
                 todo = ToDo.objects.create(name=name, description=user_data.get("description", ""),
-                                           do_by=user_data.get("do_by", ""))
-                for tag in user_data.get('tags'):
+                                           do_by=user_data.get("do_by", ""), user=user)
+                for tag in user_data.get('tags',[]):
                     tag_obj = Tags.objects.filter(name=tag)[0]
                     if not tag_obj:
                         tag_obj = Tags(name=tag)
@@ -97,7 +97,7 @@ class ToDoView(View):
                     todo.tags.add(tag_obj)
                 todo.save()
                 response.status_code = 201
-                return HttpResponse
+                return response
         return HttpResponseBadRequest("Enter the Correct Data")
 
     @check_authentication

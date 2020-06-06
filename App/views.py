@@ -104,28 +104,24 @@ class ToDoView(View):
         user_data = decode_data(request.body)
         response = HttpResponse()
         if user_data and isinstance(user_data, dict):
-            name = user_data.get("name") or ""
-            description = user_data.get("description") or ""
-            do_by = user_data.get("do_by") or ""
-            tags = user_data.get("tags") or []
-        else:
-            return HttpResponseBadRequest("Enter the Correct Data")
-        if name:
             user = request.user
-            for item in ToDo.objects.filter(user__username = user.username):
+            name = user_data.get('name')
+            for item in ToDo.objects.filter(user__username=user.username):
                 if name == item.name:
                     response.status_code = 409
                     return response
-            todo = user.todo.create(name=name, description=description, do_by=do_by)
-            for tag in tags:
-                tag_obj = Tags.objects.filter(name = tag)[0]
-                if not tag_obj:
-                    tag_obj = Tags(name=tag)
-                    tag_obj.save()
-                todo.tags.add(tag_obj)
-            todo.save()
-            response.status_code = 201
-            return response
+            if name:
+                todo = ToDo.objects.create(name = name, description = user_data.get("description",""),
+                                           do_by = user_data.get("do_by", ""))
+                for tag in user_data.get('tags'):
+                    tag_obj = Tags.objects.filter(name=tag)[0]
+                    if not tag_obj:
+                        tag_obj = Tags(name=tag)
+                        tag_obj.save()
+                    todo.tags.add(tag_obj)
+                todo.save()
+                response.status_code = 201
+                return HttpResponse
         return HttpResponseBadRequest("Enter the Correct Data")
 
     @check_authentication
@@ -149,6 +145,16 @@ class ToDoView(View):
                 return response
             return HttpResponseBadRequest("No ToDo found for the Id")
         return HttpResponseBadRequest("Please check the Data format and provide the Id")
+
+    @check_authentication
+    def delete(self,request,id = None):
+        todo = ToDo.objects.filter(id = id)
+        if todo:
+            todo.delete()
+            return HttpResponse('ToDo deleted!')
+        else:
+            return HttpResponseBadRequest('No ToDo to delete')
+
 
 
 

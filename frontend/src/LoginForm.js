@@ -34,7 +34,7 @@ class LoginForm extends React.Component{
             value : "",
             password: "",
             error: "",
-            abc: ""
+            data: []
         }
 
     }
@@ -47,7 +47,7 @@ class LoginForm extends React.Component{
         console.log(this.state.password, this.state.username)
         axios.post('http://localhost:8000/ToDo/login/', {username: this.state.username,
             password: this.state.password,}).then(res => {
-            this.setState({success: "true", abc : Object.keys(res.data.data).map(i => res.data.data[i])})
+            this.setState({success: "true", data : Object.keys(res.data.data).map(i => res.data.data[i])})
         }).catch(err => {
             let res = err.response
             if (res.status == 403){
@@ -61,7 +61,7 @@ class LoginForm extends React.Component{
         const {classes}= this.props
         return (
             <div>
-            {(this.state.success) ? <Home value = {this.state.abc}/> :
+            {(this.state.success) ? <Home value = {this.state.data}/> :
                 (<Container component = "main" maxWidth="xs">
                 <CssBaseline />
                 <div className={classes.page}>

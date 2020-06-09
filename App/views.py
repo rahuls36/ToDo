@@ -8,12 +8,12 @@ from App.models import ToDo, Tags
 from django.core import serializers
 from .utils import decode_data, check_authentication, create_url
 from collections import defaultdict
+from django.shortcuts import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 
 # Create your views here.
 class Register(View):
-
     def post(self, request):
         response = HttpResponse()
         user_data = decode_data(request.body)
@@ -37,7 +37,7 @@ class Login(View):
 
     def post(self, request):
         user = request.user
-        url = create_url(user, 'ToDo')
+        url = reverse('ToDo')
         if user.is_authenticated:
             return redirect(url)
         else:
@@ -49,6 +49,7 @@ class Login(View):
                 if user:
                     login(request, user)
                     return redirect(url)
+                    #return HttpResponse()
                 return HttpResponseForbidden("Please Enter the correct credentials")
             return HttpResponseForbidden("Please Enter the correct credentials")
 
@@ -66,6 +67,7 @@ class ToDoView(View):
     def get(self, request, todo_id=None):
         user = request.user
         name = request.GET.get("name")
+        print(todo_id)
         todo = user.todo.filter(name=name) if name else user.todo.filter(id=todo_id) if todo_id else user.todo.all()
         data = json.loads(serializers.serialize('json', todo)) if todo else ""
         if data:

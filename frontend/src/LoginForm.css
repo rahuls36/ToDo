@@ -1,0 +1,16 @@
+@media all and (min-width: 480px) {
+  .LoginForm {
+    padding: 100px 0px  300px;
+      background-color: black;
+  }
+  .LoginForm h2{
+      padding : 10px 100px;
+      color: white;
+  }
+
+  .LoginForm Form {
+      padding: 100px 10px;
+    margin: 0 auto;
+    max-width: 320px;
+  }
+}
